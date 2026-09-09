@@ -1,0 +1,24 @@
+# Build & object files
+*.o
+*.obj
+*.a
+*.lib
+*.exe
+
+# Debug files
+*.pdb
+*.idb
+*.dSYM/
+*.su
+
+# Directories
+build/
+bin/
+out/
+.cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*~
