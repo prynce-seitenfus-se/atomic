@@ -24,7 +24,8 @@ typedef AtomicSize atomic_size_t;
  * @brief Stores a value into an atomic_size_t object with release semantics.
  *
  * Ensures all prior memory operations (reads and writes) are committed and visible
- * before the new value is stored into the target object.
+ * before the new value is stored into the target object. Uses direct compiler
+ * intrinsics for optimal target-instruction selection.
  *
  * @param obj Pointer to the atomic_size_t object.
  * @param desired The value to store.
@@ -36,11 +37,13 @@ static inline void atomic_store_release(atomic_size_t* obj, size_t desired)
     }
 
 #if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__ATOMIC_RELEASE)
-    __atomic_thread_fence(__ATOMIC_RELEASE);
+    __atomic_store_n(&obj->value, desired, __ATOMIC_RELEASE);
 #elif defined(__GNUC__)
     __sync_synchronize();
-#endif
     obj->value = desired;
+#else
+    obj->value = desired;
+#endif
 }
 
 /**
@@ -58,13 +61,55 @@ static inline size_t atomic_load_acquire(const atomic_size_t* obj)
         return 0U;
     }
 
-    size_t val = obj->value;
 #if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__ATOMIC_ACQUIRE)
-    __atomic_thread_fence(__ATOMIC_ACQUIRE);
+    return __atomic_load_n(&obj->value, __ATOMIC_ACQUIRE);
 #elif defined(__GNUC__)
+    size_t val = obj->value;
     __sync_synchronize();
-#endif
     return val;
+#else
+    return obj->value;
+#endif
+}
+
+/**
+ * @brief Loads a value from an atomic_size_t object with relaxed semantics (no memory fence).
+ *
+ * Suitable when reading a variable owned exclusively by the current execution context.
+ *
+ * @param obj Pointer to the atomic_size_t object.
+ * @return The value loaded from the object, or 0 if obj is NULL.
+ */
+static inline size_t atomic_load_relaxed(const atomic_size_t* obj)
+{
+    if (obj == NULL) {
+        return 0U;
+    }
+
+#if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__ATOMIC_RELAXED)
+    return __atomic_load_n(&obj->value, __ATOMIC_RELAXED);
+#else
+    return obj->value;
+#endif
+}
+
+/**
+ * @brief Stores a value into an atomic_size_t object with relaxed semantics (no memory fence).
+ *
+ * @param obj Pointer to the atomic_size_t object.
+ * @param desired The value to store.
+ */
+static inline void atomic_store_relaxed(atomic_size_t* obj, size_t desired)
+{
+    if (obj == NULL) {
+        return;
+    }
+
+#if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__ATOMIC_RELAXED)
+    __atomic_store_n(&obj->value, desired, __ATOMIC_RELAXED);
+#else
+    obj->value = desired;
+#endif
 }
 
 /**
