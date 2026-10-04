@@ -30,7 +30,7 @@ typedef AtomicSize atomic_size_t;
  * @param obj Pointer to the atomic_size_t object.
  * @param desired The value to store.
  */
-static inline void atomic_store_release(atomic_size_t* obj, size_t desired)
+static inline __attribute__((no_instrument_function)) void atomic_store_release(atomic_size_t* obj, size_t desired)
 {
     if (obj == NULL) {
         return;
@@ -55,7 +55,7 @@ static inline void atomic_store_release(atomic_size_t* obj, size_t desired)
  * @param obj Pointer to the atomic_size_t object.
  * @return The value loaded from the object, or 0 if obj is NULL.
  */
-static inline size_t atomic_load_acquire(const atomic_size_t* obj)
+static inline __attribute__((no_instrument_function)) size_t atomic_load_acquire(const atomic_size_t* obj)
 {
     if (obj == NULL) {
         return 0U;
@@ -80,7 +80,7 @@ static inline size_t atomic_load_acquire(const atomic_size_t* obj)
  * @param obj Pointer to the atomic_size_t object.
  * @return The value loaded from the object, or 0 if obj is NULL.
  */
-static inline size_t atomic_load_relaxed(const atomic_size_t* obj)
+static inline __attribute__((no_instrument_function)) size_t atomic_load_relaxed(const atomic_size_t* obj)
 {
     if (obj == NULL) {
         return 0U;
@@ -99,7 +99,7 @@ static inline size_t atomic_load_relaxed(const atomic_size_t* obj)
  * @param obj Pointer to the atomic_size_t object.
  * @param desired The value to store.
  */
-static inline void atomic_store_relaxed(atomic_size_t* obj, size_t desired)
+static inline __attribute__((no_instrument_function)) void atomic_store_relaxed(atomic_size_t* obj, size_t desired)
 {
     if (obj == NULL) {
         return;
@@ -120,7 +120,7 @@ static inline void atomic_store_relaxed(atomic_size_t* obj, size_t desired)
  * @param obj Pointer to the atomic_size_t object.
  * @param desired Initial value.
  */
-static inline void atomic_init_size_t(atomic_size_t* obj, size_t desired)
+static inline __attribute__((no_instrument_function)) void atomic_init_size_t(atomic_size_t* obj, size_t desired)
 {
     if (obj == NULL) {
         return;
@@ -132,7 +132,7 @@ static inline void atomic_init_size_t(atomic_size_t* obj, size_t desired)
 /**
  * @brief Issues a standalone acquire memory barrier.
  */
-static inline void atomic_thread_fence_acquire(void)
+static inline __attribute__((no_instrument_function)) void atomic_thread_fence_acquire(void)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__ATOMIC_ACQUIRE)
     __atomic_thread_fence(__ATOMIC_ACQUIRE);
@@ -144,7 +144,7 @@ static inline void atomic_thread_fence_acquire(void)
 /**
  * @brief Issues a standalone release memory barrier.
  */
-static inline void atomic_thread_fence_release(void)
+static inline __attribute__((no_instrument_function)) void atomic_thread_fence_release(void)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__ATOMIC_RELEASE)
     __atomic_thread_fence(__ATOMIC_RELEASE);
@@ -156,7 +156,7 @@ static inline void atomic_thread_fence_release(void)
 /**
  * @brief Issues a standalone sequentially consistent (full) memory barrier.
  */
-static inline void atomic_thread_fence_seq_cst(void)
+static inline __attribute__((no_instrument_function)) void atomic_thread_fence_seq_cst(void)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__ATOMIC_SEQ_CST)
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
